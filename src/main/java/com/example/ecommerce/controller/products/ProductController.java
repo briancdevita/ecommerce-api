@@ -68,6 +68,8 @@ public class ProductController {
     }
 
 
+    //delete
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
