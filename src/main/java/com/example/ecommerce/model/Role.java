@@ -5,13 +5,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 
 @Entity
-public class Role {
+@Data// Genera getters, setters, toString, etc.
+@NoArgsConstructor // Constructor sin argumentos
+@AllArgsConstructor
+@Builder// Constructor con todos los argumentos
+public class Role implements GrantedAuthority {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,19 +23,10 @@ public class Role {
     private String name;
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
+    @Override
+    public String getAuthority() {
         return name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
 }
