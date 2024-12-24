@@ -1,11 +1,10 @@
 package com.example.ecommerce.config.auth;
 
 
-import com.example.ecommerce.controller.AuthenticationRequest;
-import com.example.ecommerce.controller.AuthenticationResponse;
-import com.example.ecommerce.controller.RegisterRequest;
+import com.example.ecommerce.controller.auth.AuthenticationRequest;
+import com.example.ecommerce.controller.auth.AuthenticationResponse;
+import com.example.ecommerce.controller.auth.RegisterRequest;
 import com.example.ecommerce.jwt.JwtService;
-import com.example.ecommerce.model.Role;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.RoleRepository;
 import com.example.ecommerce.repository.UserRepository;
