@@ -1,4 +1,4 @@
-package com.example.ecommerce.controller;
+package com.example.ecommerce.controller.auth;
 
 
 import lombok.*;

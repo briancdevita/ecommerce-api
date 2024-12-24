@@ -1,4 +1,4 @@
-package com.example.ecommerce.controller;
+package com.example.ecommerce.controller.auth;
 
 
 import lombok.*;
@@ -8,11 +8,10 @@ import lombok.*;
 @Data
 @Setter
 @Getter
-public class AuthenticationRequest {
+public class RegisterRequest {
 
     private String username;
+    private String email;
     private String password;
-
-
 
 }
