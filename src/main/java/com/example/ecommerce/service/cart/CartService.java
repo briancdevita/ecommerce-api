@@ -29,6 +29,11 @@ public class CartService {
         this.productRepository = productRepository;
     }
 
+
+
+
+
+
     /**
      * Obtiene el carrito de un usuario y lo convierte a DTO.
      */
@@ -110,4 +115,52 @@ public class CartService {
         itemDTO.setQuantity(item.getQuantity());
         return itemDTO;
     }
+
+
+    public void clearCart(User user) {
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
+
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+    }
+
+    public void updateQuantity(User user, Long productId, Integer quantity) {
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new IllegalArgumentException("Cart not found for user: " + user.getUsername()));
+
+        CartItem cartItem = cart.getCartItems().stream()
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Product not found in cart: " + productId));
+
+        if (quantity <= 0) {
+            // Eliminar el producto del carrito si la cantidad es 0
+            cart.getCartItems().remove(cartItem);
+            cartItemRepository.delete(cartItem);
+        } else {
+            // Actualizar la cantidad
+            cartItem.setQuantity(quantity);
+            cartItemRepository.save(cartItem);
+        }
+    }
+
+
+    public Double calculateTotal(CartDTO cartDTO) {
+        return cartDTO.getItems().stream()
+                .mapToDouble(item -> item.getQuantity() * productRepository.findById(item.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found: " + item.getProductId()))
+                        .getPrice())
+                .sum();
+    }
+
+
+
+
+
+
+
 }
+
+
+
