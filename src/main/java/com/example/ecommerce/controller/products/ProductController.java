@@ -4,6 +4,7 @@ package com.example.ecommerce.controller.products;
 import com.example.ecommerce.DTO.ProductDTO;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.service.products.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +39,7 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<Product> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         Product product = Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
