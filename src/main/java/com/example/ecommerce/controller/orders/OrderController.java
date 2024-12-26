@@ -9,6 +9,7 @@ import com.example.ecommerce.service.Order.OrderService;
 import com.example.ecommerce.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,23 @@ public class OrderController {
         this.orderService = orderService;
         this.userService = userService;
     }
+
+
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<List<OrderDTO>> getAllOrders(
+            @RequestParam(required = false)
+            OrderStatus orderStatus
+    ) {
+        if (orderStatus != null) {
+            return ResponseEntity.ok(orderService.getOrdersByStatus(orderStatus));
+        }
+        return ResponseEntity.ok(orderService.getAllOrders());
+
+    }
+
+
 
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@AuthenticationPrincipal UserDetails userDetails) {
@@ -60,8 +78,8 @@ public class OrderController {
     }
 
 
-    @GetMapping("/admin")
-    public ResponseEntity<List<OrderDTO>> getAllOrders(
+    @GetMapping("/admin/filters")
+    public ResponseEntity<List<OrderDTO>> getAllOrdersFiltered(
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String status) {
         // Llama al servicio para obtener las órdenes filtradas
@@ -80,6 +98,9 @@ public class OrderController {
         var updatedOrder = orderService.updateOrderStatus(id, orderStatus, user);
         return ResponseEntity.ok(updatedOrder);
     }
+
+
+
 
 
 }

@@ -49,6 +49,22 @@ public class OrderService {
 
 
 
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
+    }
+
+
+    public List<OrderDTO> getOrdersByStatus(OrderStatus status) {
+        List<Order> orders = orderRepository.findByStatus(status);
+        return orders.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
+    }
+
+
+
+
+
+
     public OrderDTO createOrder(User user) {
         CartDTO cart = cartService.getCartByUser(user);
 
@@ -103,6 +119,8 @@ public class OrderService {
     public OrderDTO mapToOrderDTO(Order order) {
         return OrderDTO.builder()
                 .id(order.getId())
+                .orderDate(order.getOrderDate())
+                .totalPrice(order.getTotalPrice())
                 .username(order.getUser().getUsername())
                 .status(order.getStatus().toString())
                 .items(order.getOrderItems().stream().map(item -> OrderItemDTO.builder()
