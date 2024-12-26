@@ -5,6 +5,7 @@ import com.example.ecommerce.DTO.CartDTO;
 import com.example.ecommerce.DTO.OrderDTO;
 import com.example.ecommerce.DTO.OrderItemDTO;
 import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.exception.error.InsufficientStockException;
 import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.OrderItem;
 import com.example.ecommerce.model.Product;
@@ -59,6 +60,11 @@ public class OrderService {
             Product product = productRepository.findById(cartItem.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+
+            validateStock(product, cartItem.getQuantity());
+
+            reduceStock(product, cartItem.getQuantity());
+
             return OrderItem.builder()
                     .order(order)
                     .product(product)
@@ -103,6 +109,19 @@ public class OrderService {
                         .mapToDouble(item -> item.getPrice() * item.getQuantity())
                         .sum())
                 .build();
+    }
+
+
+
+    public void validateStock(Product product, int requestedQuantity) {
+        if (product.getStock() < requestedQuantity) {
+            throw new InsufficientStockException(product.getId(), requestedQuantity );
+        }
+    }
+
+    public void reduceStock(Product product, int quantity) {
+        product.setStock(product.getStock() - quantity);
+        productRepository.save(product);
     }
 
 
