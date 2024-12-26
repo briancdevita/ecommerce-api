@@ -52,5 +52,24 @@ public class CartController {
     }
 
 
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clearCart(@AuthenticationPrincipal User user) {
+        cartService.clearCart(user);
+        return ResponseEntity.ok("Cart cleared");
+    }
+
+
+    @PutMapping("/update-quiantity")
+    public  ResponseEntity<String> updateQuantity(@AuthenticationPrincipal User user, @RequestParam Long productId, @RequestParam Integer quantity) {
+        cartService.updateQuantity(user, productId, quantity);
+        return ResponseEntity.ok("Quantity updated");
+    }
+
+    @GetMapping("/total")
+    public ResponseEntity<Double> getTotal(@AuthenticationPrincipal User user) {
+        CartDTO cartDTO = cartService.getCartByUser(user);
+        return ResponseEntity.ok(cartService.calculateTotal(cartDTO));
+    }
+
 
 }
