@@ -14,6 +14,8 @@ public enum ApiError {
      */
     INVALID_REQUEST("Invalid request data", HttpStatus.BAD_REQUEST),
 
+
+    NOT_FOUND("Not found", HttpStatus.NOT_FOUND),
     /**
      * Se usa cuando los datos enviados no cumplen con las reglas de negocio.
      * Ejemplo: El precio de un producto es menor que cero.

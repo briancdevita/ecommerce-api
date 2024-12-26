@@ -2,6 +2,7 @@ package com.example.ecommerce.controller.orders;
 
 
 import com.example.ecommerce.DTO.OrderDTO;
+import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.service.Order.OrderService;
@@ -68,6 +69,17 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderDTO> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestParam OrderStatus orderStatus,
+            @AuthenticationPrincipal UserDetails userDetails
+            ) {
+        var user = userService.findByUsername(userDetails.getUsername());
+        var updatedOrder = orderService.updateOrderStatus(id, orderStatus, user);
+        return ResponseEntity.ok(updatedOrder);
+    }
 
 
 }

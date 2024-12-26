@@ -5,6 +5,8 @@ import com.example.ecommerce.DTO.CartDTO;
 import com.example.ecommerce.DTO.OrderDTO;
 import com.example.ecommerce.DTO.OrderItemDTO;
 import com.example.ecommerce.enums.OrderStatus;
+import com.example.ecommerce.exception.ApiException;
+import com.example.ecommerce.exception.error.ApiError;
 import com.example.ecommerce.exception.error.InsufficientStockException;
 import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.OrderItem;
@@ -18,6 +20,7 @@ import com.example.ecommerce.service.user.UserService;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.engine.spi.CollectionEntry;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -160,5 +163,17 @@ public class OrderService {
     }
 
 
+    public OrderDTO updateOrderStatus(Long orderId, OrderStatus newStatus, User user) {
 
+        if (user.getRoles().stream().noneMatch(role -> role.getName().equals("ADMIN"))) {
+            throw new ApiException(ApiError.FORBIDDEN);
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+
+        return mapToOrderDTO(order);
+    }
 }
