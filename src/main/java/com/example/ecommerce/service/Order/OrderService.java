@@ -14,6 +14,7 @@ import com.example.ecommerce.repository.OrderItemRepository;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.cart.CartService;
+import com.example.ecommerce.service.user.UserService;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.engine.spi.CollectionEntry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +29,19 @@ public class OrderService {
 
 
     private final ProductRepository productRepository;
-    private OrderRepository orderRepository;
-    private OrderItemRepository orderItemRepository;
-    private CartService cartService;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final CartService cartService;
+    private final UserService userService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductRepository productRepository, UserService userService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartService = cartService;
         this.productRepository = productRepository;
+
+        this.userService = userService;
     }
 
 
@@ -123,6 +127,38 @@ public class OrderService {
         product.setStock(product.getStock() - quantity);
         productRepository.save(product);
     }
+
+
+    public List<OrderDTO> getOrdersByUserAndStatus(User user, String status) {
+        List<Order> orders;
+
+        if (status != null) {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            orders = orderRepository.findByUserAndStatus(user, orderStatus);
+        } else {
+            orders = orderRepository.findByUser(user);
+        }
+        return orders.stream().map(this::mapToOrderDTO).toList();
+    }
+
+    public List<OrderDTO> getOrdersForAdmin(String username, String status) {
+        List<Order> orders;
+        if (username != null && status != null) {
+            User user = userService.findByUsername(username);
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            orders = orderRepository.findByUserAndStatus(user, orderStatus);
+        } else if (username != null) {
+            User user = userService.findByUsername(username);
+            orders = orderRepository.findByUser(user);
+        } else if (status != null) {
+            OrderStatus orderStatus = OrderStatus.valueOf(status.toUpperCase());
+            orders = orderRepository.findByStatus(orderStatus);
+        } else {
+            orders = orderRepository.findAll();
+        }
+        return orders.stream().map(this::mapToOrderDTO).toList();
+    }
+
 
 
 }

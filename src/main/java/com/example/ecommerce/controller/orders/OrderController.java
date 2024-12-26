@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -48,5 +45,29 @@ public class OrderController {
         var orders = orderService.getOrdersByUser(user);
         return ResponseEntity.ok(orders);
     }
+
+
+    @GetMapping("/user")
+    public ResponseEntity<List<OrderDTO>> getUserOrders(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) String status
+
+    ) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        List<OrderDTO> orders = orderService.getOrdersByUserAndStatus(user, status);
+        return ResponseEntity.ok(orders);
+    }
+
+
+    @GetMapping("/admin")
+    public ResponseEntity<List<OrderDTO>> getAllOrders(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String status) {
+        // Llama al servicio para obtener las órdenes filtradas
+        List<OrderDTO> orders = orderService.getOrdersForAdmin(username, status);
+        return ResponseEntity.ok(orders);
+    }
+
+
 
 }
