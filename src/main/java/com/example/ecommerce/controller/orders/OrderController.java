@@ -2,6 +2,7 @@ package com.example.ecommerce.controller.orders;
 
 
 import com.example.ecommerce.DTO.OrderDTO;
+import com.example.ecommerce.DTO.OrderFilterDTO;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.model.Order;
 import com.example.ecommerce.model.User;
@@ -37,14 +38,9 @@ public class OrderController {
 
     @GetMapping("/admin")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<OrderDTO>> getAllOrders(
-            @RequestParam(required = false)
-            OrderStatus orderStatus
-    ) {
-        if (orderStatus != null) {
-            return ResponseEntity.ok(orderService.getOrdersByStatus(orderStatus));
-        }
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public ResponseEntity<List<OrderDTO>> getAllOrders(@ModelAttribute OrderFilterDTO filters) {
+       List<OrderDTO> orders = orderService.getOrdersWithFilters(filters);
+       return ResponseEntity.ok(orders);
 
     }
 

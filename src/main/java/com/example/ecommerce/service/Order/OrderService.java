@@ -3,6 +3,7 @@ package com.example.ecommerce.service.Order;
 
 import com.example.ecommerce.DTO.CartDTO;
 import com.example.ecommerce.DTO.OrderDTO;
+import com.example.ecommerce.DTO.OrderFilterDTO;
 import com.example.ecommerce.DTO.OrderItemDTO;
 import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.exception.ApiException;
@@ -193,5 +194,22 @@ public class OrderService {
         orderRepository.save(order);
 
         return mapToOrderDTO(order);
+    }
+
+    public List<OrderDTO> getOrdersWithFilters(OrderFilterDTO filters) {
+        String username = filters.getUsername();
+        OrderStatus status = filters.getStatus();
+        var startDate = filters.getStartDate();
+        var endDate = filters.getEndDate();
+
+
+        List<Order> orders  = orderRepository.findAll().stream()
+                .filter(order -> username == null || order.getUser().getUsername().equals(username))
+                .filter(order -> status == null || order.getStatus().equals(status))
+                .filter(order -> startDate == null || !order.getOrderDate().toLocalDate().isBefore(startDate))
+                .filter(order -> endDate == null || !order.getOrderDate().toLocalDate().isAfter(endDate))
+                .collect(Collectors.toList());
+
+        return orders.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
     }
 }
