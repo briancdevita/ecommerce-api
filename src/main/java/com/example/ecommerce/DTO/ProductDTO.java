@@ -22,6 +22,8 @@ public class ProductDTO {
     @NotBlank(message = "Category is required")
     private String category;
 
+    private Integer stock;
+
     private String img;
 
 }

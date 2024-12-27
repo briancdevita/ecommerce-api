@@ -45,6 +45,7 @@ public class ProductController {
                 .price(productDTO.getPrice())
                 .description(productDTO.getDescription())
                 .category(productDTO.getCategory())
+                .stock(productDTO.getStock())
                 .image(productDTO.getImg())
                 .build();
         Product createdProduct = productService.createProduct(product);
