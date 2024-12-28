@@ -1,6 +1,7 @@
 package com.example.ecommerce.jwt;
 
 
+import com.example.ecommerce.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,24 +30,31 @@ public class JwtService {
     }
 
 
-    public String generateToken (UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-
     public String generateToken(
-            Map<String, Object> extracClaims,
+            Map<String, Object> extraClaims,
             UserDetails userDetails
     ) {
+        if (userDetails instanceof User) {
+            User user = (User) userDetails;
+            // Agregar email y roles como claims adicionales
+            extraClaims.put("email", user.getEmail());
+            extraClaims.put("roles", user.getAuthorities());
+        }
+
         return Jwts
                 .builder()
-                .setClaims(extracClaims)
+                .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);

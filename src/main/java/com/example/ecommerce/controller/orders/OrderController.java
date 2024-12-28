@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "*", methods = {RequestMethod.POST,RequestMethod.GET})
 public class OrderController {
 
 
