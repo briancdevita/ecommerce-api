@@ -31,6 +31,13 @@ public class Product {
     @Column(nullable = false)
     private String description;
 
+    @PrePersist
+    public void setDefaultStock() {
+        if (this.stock == null) {
+            this.stock = 0; // Valor por defecto
+        }
+    }
+
 
     @Column(nullable = false)
     private String category;

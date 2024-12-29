@@ -3,11 +3,15 @@ package com.example.ecommerce.DTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
+@Builder
 @Data
 public class ProductDTO {
+
+    private Long id;
 
     @NotBlank(message = "Name is required")
     private String name;
@@ -22,6 +26,8 @@ public class ProductDTO {
     @NotBlank(message = "Category is required")
     private String category;
 
-    private String img;
+    private Integer stock;
+
+    private String image;
 
 }

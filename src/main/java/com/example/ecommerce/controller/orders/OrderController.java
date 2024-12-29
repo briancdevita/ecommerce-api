@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/orders")
+@CrossOrigin(origins = "*", methods = {RequestMethod.POST,RequestMethod.GET})
 public class OrderController {
 
 
@@ -95,6 +96,16 @@ public class OrderController {
         return ResponseEntity.ok(updatedOrder);
     }
 
+
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderDTO> getOrderById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        User user = userService.findByUsername(userDetails.getUsername());
+        OrderDTO order = orderService.getOrderByIdAndUser(id, user);
+        return ResponseEntity.ok(order);
+    }
 
 
 

@@ -23,6 +23,7 @@ import org.hibernate.engine.spi.CollectionEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -129,6 +130,7 @@ public class OrderService {
                         .productId(item.getProduct().getId())
                         .productName(item.getProduct().getName())
                         .quantity(item.getQuantity())
+                        .image(item.getProduct().getImage())
                         .price(item.getPrice())
                         .build()).toList())
                 .totalPrice(order.getOrderItems().stream()
@@ -212,4 +214,14 @@ public class OrderService {
 
         return orders.stream().map(this::mapToOrderDTO).collect(Collectors.toList());
     }
+
+
+    public OrderDTO getOrderByIdAndUser(Long orderId, User user) {
+        return orderRepository.findById(orderId)
+                .filter(order -> order.getUser().equals(user)) // Asegúrate de que la orden pertenece al usuario
+                .map(this::mapToOrderDTO) // Convierte la orden en un DTO
+                .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
+    }
+
+
 }
