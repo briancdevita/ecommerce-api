@@ -8,6 +8,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {

@@ -66,6 +66,7 @@ public class ProductController {
         Product updatedProduct = productService.updateProduct(id, Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
+                .stock(productDTO.getStock())
                 .description(productDTO.getDescription())
                 .category(productDTO.getCategory())
                 .image(productDTO.getImage())
