@@ -15,6 +15,7 @@ public class OrderItemDTO {
     private Long productId; // ID del producto
     private String productName; // Nombre del producto
     private Integer quantity; // Cantidad comprada
+    private String image;
     private Double price; // Precio del producto
 
 }

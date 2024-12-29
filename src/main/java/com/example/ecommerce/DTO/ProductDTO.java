@@ -11,7 +11,6 @@ import lombok.NonNull;
 @Data
 public class ProductDTO {
 
-    @NotBlank
     private Long id;
 
     @NotBlank(message = "Name is required")
