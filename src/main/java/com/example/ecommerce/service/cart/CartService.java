@@ -9,6 +9,7 @@ import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.CartItemRepository;
 import com.example.ecommerce.repository.CartRepository;
 import com.example.ecommerce.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -117,6 +118,7 @@ public class CartService {
     }
 
 
+    @Transactional
     public void clearCart(User user) {
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
