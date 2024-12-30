@@ -18,6 +18,9 @@ import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.cart.CartService;
 import com.example.ecommerce.service.user.UserService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.engine.spi.CollectionEntry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,9 +69,11 @@ public class OrderService {
 
 
 
-
+    @Transactional
     public OrderDTO createOrder(User user) {
         CartDTO cart = cartService.getCartByUser(user);
+        System.out.println("Cart items for user: " + user.getUsername() + ", Cart: " + cart.getItems());
+
 
         if (cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("The cart is empty. Cannot create an order.");
@@ -82,6 +87,7 @@ public class OrderService {
                 .build();
 
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
+            System.out.println("Processing CartItem: " + cartItem);
             Product product = productRepository.findById(cartItem.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
@@ -102,7 +108,10 @@ public class OrderService {
         orderRepository.save(order);
         orderItemRepository.equals(orderItems);
 
+        System.out.println("Antes de limpiar el carrito");
         cartService.clearCart(user);
+        System.out.println("Cart after clearing: " + cartService.getCartByUser(user).getItems());
+
 
         return mapToOrderDTO(order);
     }
@@ -122,7 +131,7 @@ public class OrderService {
         return OrderDTO.builder()
                 .id(order.getId())
                 .orderDate(order.getOrderDate())
-                .totalPrice(order.getTotalPrice())
+                .totalPrice(order.getTotalPrice()) // Usa el total almacenado en la entidad Order
                 .username(order.getUser().getUsername())
                 .status(order.getStatus().toString())
                 .items(order.getOrderItems().stream().map(item -> OrderItemDTO.builder()
@@ -131,23 +140,26 @@ public class OrderService {
                         .productName(item.getProduct().getName())
                         .quantity(item.getQuantity())
                         .image(item.getProduct().getImage())
-                        .price(item.getPrice())
+                        .price(item.getPrice()) // Precio por cantidad ya calculado
                         .build()).toList())
-                .totalPrice(order.getOrderItems().stream()
-                        .mapToDouble(item -> item.getPrice() * item.getQuantity())
-                        .sum())
                 .build();
     }
 
 
-
+    @PersistenceContext
+    private EntityManager entityManager;
     public void validateStock(Product product, int requestedQuantity) {
+        System.out.println("Validating stock for productId: " + product.getId() + ", stock: " + product.getStock() + ", requested: " + requestedQuantity);
+
+        entityManager.refresh(product);
         if (product.getStock() < requestedQuantity) {
             throw new InsufficientStockException(product.getId(), requestedQuantity );
         }
     }
 
+
     public void reduceStock(Product product, int quantity) {
+        entityManager.refresh(product);
         product.setStock(product.getStock() - quantity);
         productRepository.save(product);
     }
