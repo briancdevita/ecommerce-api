@@ -26,7 +26,7 @@ public class CartController {
 
 
 
-    @Autowired
+
     public CartController(CartService cartService, UserService userService) {
         this.cartService = cartService;
         this.userService = userService;

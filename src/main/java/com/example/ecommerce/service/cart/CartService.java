@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,7 +61,9 @@ public class CartService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         // Verifica si el producto ya está en el carrito
-        Optional<CartItem> existingCartItem = cart.getCartItems().stream()
+        Optional<CartItem> existingCartItem = Optional.ofNullable(cart.getCartItems())
+                .orElseGet(Collections::emptyList)
+                .stream()
                 .filter(cartItem -> cartItem.getProduct().getId().equals(productId))
                 .findFirst();
 
@@ -101,7 +104,11 @@ public class CartService {
         CartDTO cartDTO = new CartDTO();
         cartDTO.setId(cart.getId());
         cartDTO.setUsername(cart.getUser().getUsername());
-        cartDTO.setItems(cart.getCartItems().stream().map(this::convertCartItemToDTO).collect(Collectors.toList()));
+        cartDTO.setItems(Optional.ofNullable(cart.getCartItems())
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(this::convertCartItemToDTO)
+                .collect(Collectors.toList()));
         return cartDTO;
     }
 
