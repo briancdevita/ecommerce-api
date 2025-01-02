@@ -39,6 +39,8 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status; // Campo "status"
 
+    private String receiptUrl;
+
     private Double totalPrice;
 
 }

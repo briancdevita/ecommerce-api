@@ -131,6 +131,7 @@ public class OrderService {
         return OrderDTO.builder()
                 .id(order.getId())
                 .orderDate(order.getOrderDate())
+                .receiptUrl(order.getReceiptUrl())
                 .totalPrice(order.getTotalPrice()) // Usa el total almacenado en la entidad Order
                 .username(order.getUser().getUsername())
                 .status(order.getStatus().toString())
@@ -234,6 +235,23 @@ public class OrderService {
                 .map(this::mapToOrderDTO) // Convierte la orden en un DTO
                 .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
     }
+
+    @Transactional
+    public OrderDTO updateReceiptUrl(Long orderId, String receiptUrl) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
+
+        if (order.getStatus() != OrderStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot update receipt URL for an order that is not completed.");
+        }
+
+        order.setReceiptUrl(receiptUrl);
+        orderRepository.save(order);
+
+        return mapToOrderDTO(order);
+    }
+
+
 
 
 }

@@ -16,10 +16,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
-@CrossOrigin(origins = "*", methods = {RequestMethod.POST,RequestMethod.GET})
+@CrossOrigin(origins = "*", methods = {RequestMethod.POST,RequestMethod.GET, RequestMethod.PATCH})
 public class OrderController {
 
 
@@ -47,11 +48,24 @@ public class OrderController {
 
 
 
+
+
+
     @PostMapping
     public ResponseEntity<OrderDTO> createOrder(@AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.findByUsername(userDetails.getUsername());
         OrderDTO order = orderService.createOrder(user);
         return ResponseEntity.ok(order);
+    }
+
+    @PostMapping("/{orderId}/receipt")
+    public ResponseEntity<OrderDTO> updateReceiptUrl(
+            @PathVariable Long orderId,
+            @RequestBody Map<String, String> requestBody) {
+        System.out.println("Request body: " + requestBody);
+        String receiptUrl = requestBody.get("receiptUrl");
+        OrderDTO updatedOrder = orderService.updateReceiptUrl(orderId, receiptUrl);
+        return ResponseEntity.ok(updatedOrder);
     }
 
 
