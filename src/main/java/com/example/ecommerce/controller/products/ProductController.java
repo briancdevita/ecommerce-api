@@ -2,6 +2,7 @@ package com.example.ecommerce.controller.products;
 
 
 import com.example.ecommerce.DTO.ProductDTO;
+import com.example.ecommerce.DTO.ProductSalesDTO;
 import com.example.ecommerce.model.Product;
 import com.example.ecommerce.service.products.ProductService;
 import jakarta.validation.Valid;
@@ -101,6 +102,14 @@ public class ProductController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+
+    @GetMapping("/top-selling")
+    public ResponseEntity<List<ProductSalesDTO>> getTopSellingProducts(
+            @RequestParam(defaultValue = "10") int limit) {
+        List<ProductSalesDTO> topSellingProducts = productService.getTopSellingProducts(limit);
+        return ResponseEntity.ok(topSellingProducts);
     }
 
 }
