@@ -59,6 +59,7 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/receipt")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<OrderDTO> updateReceiptUrl(
             @PathVariable Long orderId,
             @RequestBody Map<String, String> requestBody) {
@@ -99,7 +100,10 @@ public class OrderController {
     }
 
 
+
+
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('USER')")
     public ResponseEntity<OrderDTO> updateOrderStatus(
             @PathVariable Long id,
             @RequestParam OrderStatus orderStatus,

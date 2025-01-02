@@ -198,18 +198,26 @@ public class OrderService {
 
 
     public OrderDTO updateOrderStatus(Long orderId, OrderStatus newStatus, User user) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
 
-        if (user.getRoles().stream().noneMatch(role -> role.getName().equals("ADMIN"))) {
+        if (user.getRoles().stream().anyMatch(role -> role.getName().equals("ADMIN"))) {
+            // Permitir a los administradores cambiar cualquier estado
+            order.setStatus(newStatus);
+        } else if (user.getRoles().stream().anyMatch(role -> role.getName().equals("USER"))) {
+            // Restricciones específicas para usuarios
+            if (newStatus != OrderStatus.COMPLETED) {
+                throw new ApiException(ApiError.FORBIDDEN);
+            }
+            order.setStatus(newStatus);
+        } else {
             throw new ApiException(ApiError.FORBIDDEN);
         }
 
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
-        order.setStatus(newStatus);
         orderRepository.save(order);
-
         return mapToOrderDTO(order);
     }
+
 
     public List<OrderDTO> getOrdersWithFilters(OrderFilterDTO filters) {
         String username = filters.getUsername();

@@ -2,6 +2,7 @@ package com.example.ecommerce.config;
 import com.example.ecommerce.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,6 +40,8 @@ public class SecurityConfiguration {
                             .requestMatchers("/admin/**").hasAuthority("ADMIN")
                             .requestMatchers("/products/**").permitAll()
                             .requestMatchers("/product/**").permitAll()
+                            .requestMatchers(HttpMethod.PATCH, "/orders/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/orders/**").permitAll()
                             .requestMatchers("/orders/**").permitAll()
                             .anyRequest().authenticated()
 
