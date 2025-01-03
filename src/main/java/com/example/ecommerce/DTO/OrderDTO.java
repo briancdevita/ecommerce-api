@@ -21,4 +21,6 @@ public class OrderDTO {
     private String status; // Estado de la orden (e.g., "PENDING", "COMPLETED")
     private List<OrderItemDTO> items; // Lista de productos en la orden
     private Double totalPrice; // Precio total de la orden
+    private Double discountAmount; // Monto de descuento
+    private Double finalAmount; // Precio final de la orden
 }

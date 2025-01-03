@@ -9,13 +9,11 @@ import com.example.ecommerce.enums.OrderStatus;
 import com.example.ecommerce.exception.ApiException;
 import com.example.ecommerce.exception.error.ApiError;
 import com.example.ecommerce.exception.error.InsufficientStockException;
-import com.example.ecommerce.model.Order;
-import com.example.ecommerce.model.OrderItem;
-import com.example.ecommerce.model.Product;
-import com.example.ecommerce.model.User;
+import com.example.ecommerce.model.*;
 import com.example.ecommerce.repository.OrderItemRepository;
 import com.example.ecommerce.repository.OrderRepository;
 import com.example.ecommerce.repository.ProductRepository;
+import com.example.ecommerce.service.CuponService;
 import com.example.ecommerce.service.cart.CartService;
 import com.example.ecommerce.service.user.UserService;
 import jakarta.persistence.EntityManager;
@@ -41,15 +39,17 @@ public class OrderService {
     private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
     private final UserService userService;
+    private final CuponService cuponService;
 
     @Autowired
-    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductRepository productRepository, UserService userService) {
+    public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductRepository productRepository, UserService userService, CuponService cuponService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartService = cartService;
         this.productRepository = productRepository;
 
         this.userService = userService;
+        this.cuponService = cuponService;
     }
 
 
@@ -70,27 +70,53 @@ public class OrderService {
 
 
     @Transactional
-    public OrderDTO createOrder(User user) {
+    public OrderDTO createOrder(User user, String couponCode) {
+        // Obtener el carrito del usuario
         CartDTO cart = cartService.getCartByUser(user);
-        System.out.println("Cart items for user: " + user.getUsername() + ", Cart: " + cart.getItems());
 
 
         if (cart.getItems().isEmpty()) {
-            throw new IllegalArgumentException("The cart is empty. Cannot create an order.");
+            throw new IllegalArgumentException("El carrito está vacío. No se puede crear una orden.");
         }
 
+        // Calcular el total del carrito
+        Double totalPrice = cartService.calculateTotal(cart);
+        Double discountAmount = 0.0;
+        Cupon cupon = null;
+
+        // Validar y aplicar el cupón si se proporciona
+        if (couponCode != null && !couponCode.trim().isEmpty()) {
+            try {
+                cupon = cuponService.validateCoupon(couponCode);
+                discountAmount = totalPrice * (cupon.getDiscountPercentage() / 100);
+                // Incrementar el uso del cupón
+                cuponService.incrementUsage(cupon);
+            } catch ( ApiException e) {
+                System.out.println(e.getMessage());
+                throw new IllegalArgumentException("Cupón inválido: " + e.getMessage());
+            }
+        }
+
+        // Calcular el monto final
+        Double finalAmount = totalPrice - discountAmount;
+        System.out.println("Total: " + totalPrice + ", Descuento: " + discountAmount + ", Final: " + finalAmount);
+
+        // Crear la orden
         Order order = Order.builder()
                 .user(user)
                 .orderDate(LocalDateTime.now())
-                .totalPrice(cartService.calculateTotal(cart))
+                .totalPrice(totalPrice)
+                .discountAmount(discountAmount)
+                .finalAmount(finalAmount)
                 .status(OrderStatus.PENDING)
+                .cupon(cupon)
                 .build();
 
+        // Procesar los items del carrito
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> {
-            System.out.println("Processing CartItem: " + cartItem);
-            Product product = productRepository.findById(cartItem.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
+            Product product = productRepository.findById(cartItem.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado"));
 
             validateStock(product, cartItem.getQuantity());
 
@@ -106,11 +132,10 @@ public class OrderService {
 
         order.setOrderItems(orderItems);
         orderRepository.save(order);
-        orderItemRepository.equals(orderItems);
+        orderItemRepository.saveAll(orderItems); // Corregir aquí
 
-        System.out.println("Antes de limpiar el carrito");
+
         cartService.clearCart(user);
-        System.out.println("Cart after clearing: " + cartService.getCartByUser(user).getItems());
 
 
         return mapToOrderDTO(order);
@@ -132,7 +157,8 @@ public class OrderService {
                 .id(order.getId())
                 .orderDate(order.getOrderDate())
                 .receiptUrl(order.getReceiptUrl())
-                .totalPrice(order.getTotalPrice()) // Usa el total almacenado en la entidad Order
+                .discountAmount(order.getDiscountAmount())
+                .finalAmount(order.getFinalAmount())
                 .username(order.getUser().getUsername())
                 .status(order.getStatus().toString())
                 .items(order.getOrderItems().stream().map(item -> OrderItemDTO.builder()

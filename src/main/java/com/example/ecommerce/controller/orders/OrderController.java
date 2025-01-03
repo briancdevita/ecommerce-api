@@ -4,10 +4,11 @@ package com.example.ecommerce.controller.orders;
 import com.example.ecommerce.DTO.OrderDTO;
 import com.example.ecommerce.DTO.OrderFilterDTO;
 import com.example.ecommerce.enums.OrderStatus;
-import com.example.ecommerce.model.Order;
+import com.example.ecommerce.DTO.OrderRequestDTO;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.service.Order.OrderService;
 import com.example.ecommerce.service.user.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,9 +53,13 @@ public class OrderController {
 
 
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@AuthenticationPrincipal UserDetails userDetails) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OrderDTO> createOrder(
+            @Valid @RequestBody OrderRequestDTO orderRequest,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        System.out.println(orderRequest);
         User user = userService.findByUsername(userDetails.getUsername());
-        OrderDTO order = orderService.createOrder(user);
+        OrderDTO order = orderService.createOrder(user, orderRequest.getCouponCode());
         return ResponseEntity.ok(order);
     }
 

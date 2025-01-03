@@ -41,6 +41,14 @@ public class Order {
 
     private String receiptUrl;
 
+    @ManyToOne
+    @JoinColumn(name = "cupon_id")
+    private Cupon cupon;
+
+
+    private Double discountAmount;
+    private Double finalAmount;
+
     private Double totalPrice;
 
 }
