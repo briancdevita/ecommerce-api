@@ -63,7 +63,7 @@ public class ProductController {
             @PathVariable Long id,
             @RequestBody ProductDTO productDTO
     ) {
-        System.out.println(id);
+
         Product updatedProduct = productService.updateProduct(id, Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())

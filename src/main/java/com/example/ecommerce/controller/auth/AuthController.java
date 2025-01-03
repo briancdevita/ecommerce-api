@@ -24,13 +24,13 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register (@RequestBody RegisterRequest request) {
-        System.out.println("Datos de Registro Recibidos: " + request.toString());
+
         return ResponseEntity.ok(authenticationService.register(request));
     }
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate (@RequestBody AuthenticationRequest request) {
-        System.out.println("Datos de Registro Recibidos: " + request.toString());
+
 
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }

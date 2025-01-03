@@ -92,14 +92,14 @@ public class OrderService {
                 // Incrementar el uso del cupón
                 cuponService.incrementUsage(cupon);
             } catch ( ApiException e) {
-                System.out.println(e.getMessage());
+
                 throw new IllegalArgumentException("Cupón inválido: " + e.getMessage());
             }
         }
 
         // Calcular el monto final
         Double finalAmount = totalPrice - discountAmount;
-        System.out.println("Total: " + totalPrice + ", Descuento: " + discountAmount + ", Final: " + finalAmount);
+
 
         // Crear la orden
         Order order = Order.builder()
@@ -176,7 +176,6 @@ public class OrderService {
     @PersistenceContext
     private EntityManager entityManager;
     public void validateStock(Product product, int requestedQuantity) {
-        System.out.println("Validating stock for productId: " + product.getId() + ", stock: " + product.getStock() + ", requested: " + requestedQuantity);
 
         entityManager.refresh(product);
         if (product.getStock() < requestedQuantity) {

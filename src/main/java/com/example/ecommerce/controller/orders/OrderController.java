@@ -57,7 +57,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> createOrder(
             @Valid @RequestBody OrderRequestDTO orderRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
-        System.out.println(orderRequest);
+
         User user = userService.findByUsername(userDetails.getUsername());
         OrderDTO order = orderService.createOrder(user, orderRequest.getCouponCode());
         return ResponseEntity.ok(order);
@@ -68,7 +68,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> updateReceiptUrl(
             @PathVariable Long orderId,
             @RequestBody Map<String, String> requestBody) {
-        System.out.println("Request body: " + requestBody);
+
         String receiptUrl = requestBody.get("receiptUrl");
         OrderDTO updatedOrder = orderService.updateReceiptUrl(orderId, receiptUrl);
         return ResponseEntity.ok(updatedOrder);
