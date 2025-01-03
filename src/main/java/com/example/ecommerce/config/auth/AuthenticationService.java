@@ -44,6 +44,7 @@ public class AuthenticationService {
         // Crear el usuario con el rol asignado
         var user = User.builder()
                 .email(request.getEmail())
+                .address(request.getAddress())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .username(request.getUsername())
                 .roles(Set.of(userRole)) // Asignar el rol existente
