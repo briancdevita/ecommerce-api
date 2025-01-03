@@ -4,7 +4,9 @@ package com.example.ecommerce.service.user;
 import com.example.ecommerce.DTO.RoleDTO;
 import com.example.ecommerce.DTO.UpdateUserDTO;
 import com.example.ecommerce.DTO.UserDTO;
+import com.example.ecommerce.exception.ApiException;
 import com.example.ecommerce.exception.GlobalExceptionHandler;
+import com.example.ecommerce.exception.error.ApiError;
 import com.example.ecommerce.model.Role;
 import com.example.ecommerce.model.User;
 import com.example.ecommerce.repository.RoleRepository;
@@ -70,6 +72,7 @@ public class UserService {
         return UserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .address(user.getAddress())
                 .email(user.getEmail())
                 .roles(user.getRoles().stream()
                         .map(role -> RoleDTO.builder().name(role.getName()).build())
@@ -78,8 +81,20 @@ public class UserService {
     }
 
 
+    public UserDTO updateAddress(Long userId, String newAddress) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
 
+        user.setAddress(newAddress);
+        userRepository.save(user);
 
+        return mapToUserDTO(user);
+    }
 
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ApiException(ApiError.NOT_FOUND));
 
+        return mapToUserDTO(user);
+    }
 }

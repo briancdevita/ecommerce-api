@@ -27,6 +27,7 @@ public class User implements UserDetails {
     private String username;
     private String email;
     private String password;
+    private String address;
 
 
     @ManyToMany(fetch = FetchType.EAGER)

@@ -42,6 +42,8 @@ public class JwtService {
             User user = (User) userDetails;
             // Agregar email y roles como claims adicionales
             extraClaims.put("email", user.getEmail());
+            extraClaims.put("id", user.getId());
+            extraClaims.put("address", user.getAddress());
             extraClaims.put("roles", user.getAuthorities());
         }
 

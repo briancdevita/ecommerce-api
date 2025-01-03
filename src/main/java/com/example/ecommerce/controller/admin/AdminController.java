@@ -44,6 +44,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+
     @PutMapping("/user/{id}")
     public ResponseEntity<UserDTO> updateUser(
             @PathVariable Long id,
