@@ -40,6 +40,11 @@ public class SecurityConfiguration {
                             .requestMatchers("/admin/**").hasAuthority("ADMIN")
                             .requestMatchers("/products/**").permitAll()
                             .requestMatchers("/product/**").permitAll()
+                            .requestMatchers(
+                                    "/v3/api-docs/**", // Swagger API Docs
+                                    "/swagger-ui/**",  // Swagger UI
+                                    "/swagger-ui.html" // Swagger UI HTML
+                            ).permitAll()
                             .requestMatchers(HttpMethod.PATCH, "/orders/**").permitAll()
                             .requestMatchers(HttpMethod.POST, "/orders/**").permitAll()
                             .requestMatchers("/orders/**").permitAll()
